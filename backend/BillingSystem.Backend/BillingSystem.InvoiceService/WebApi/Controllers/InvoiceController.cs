@@ -33,17 +33,29 @@ namespace BillingSystem.InvoiceService.WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> InvoiceSave(InvoiceSaveDto request)
         {
-            return Ok("");
+            var result = await _invoiceService.Add(request);
+            if (!result.Success) { return BadRequest(result); }
+            return Ok(result);
         }
         [HttpPut]
         public async Task<IActionResult> InvoiceUpdate(InvoiceUpdateDto request)
         {
-            return Ok();
+            var result = await _invoiceService.Update(request);
+            if (!result.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
         [HttpDelete]
         public async Task<IActionResult> InvoiceDelete(InvoiceDeleteRequestDto request)
         {
-            return Ok();
+            var result = await _invoiceService.Delete(request);
+            if (!result.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
     }
 }

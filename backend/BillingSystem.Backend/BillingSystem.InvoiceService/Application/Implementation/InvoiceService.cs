@@ -14,10 +14,11 @@ namespace BillingSystem.InvoiceService.Application.Implementation
         private readonly IUnitOfWork _unitOfWork;
         private readonly IInvoiceLineRepository _invoiceLineRepository;
 
-        public InvoiceService(IInvoiceRepository invoiceRepository, IUnitOfWork unitOfWork)
+        public InvoiceService(IInvoiceRepository invoiceRepository, IUnitOfWork unitOfWork, IInvoiceLineRepository invoiceLineRepository)
         {
             _invoiceRepository = invoiceRepository;
             _unitOfWork = unitOfWork;
+            _invoiceLineRepository = invoiceLineRepository;
         }
 
         public async Task<IDataResult<InvoiceSaveResponseDto>> Add(InvoiceSaveDto dto)
@@ -47,7 +48,8 @@ namespace BillingSystem.InvoiceService.Application.Implementation
                 await _invoiceRepository.AddAsync(entity);
                 await _unitOfWork.CommitAsync();
                 await _unitOfWork.CommitTransactionAsync();
-                return new SuccessDataResult<InvoiceSaveResponseDto>(new InvoiceSaveResponseDto {
+                return new SuccessDataResult<InvoiceSaveResponseDto>(new InvoiceSaveResponseDto
+                {
                     InvoiceId = entity.InvoiceId,
                     Message = "Fatura başarıyla kaydedildi."
                 });
@@ -58,7 +60,7 @@ namespace BillingSystem.InvoiceService.Application.Implementation
                 return new ErrorDataResult<InvoiceSaveResponseDto>(ex.ToString());
                 throw new Exception($"Fatura kaydı sırasında hata: {ex.Message}");
             }
-            
+
         }
 
         public async Task<IDataResult<InvoiceDeleteResponseDto>> Delete(InvoiceDeleteRequestDto dto)
@@ -70,7 +72,7 @@ namespace BillingSystem.InvoiceService.Application.Implementation
                 var invoice = await _invoiceRepository.GetAsync(i => i.InvoiceId == dto.InvoiceId && !i.IsDeleted);
                 if (invoice == null)
                     return new ErrorDataResult<InvoiceDeleteResponseDto>(new InvoiceDeleteResponseDto { Success = false, Message = "Fatura bulunamadı." });
-                
+
                 var lines = await _invoiceLineRepository.ListAsync(l => l.InvoiceId == dto.InvoiceId && !l.IsDeleted);
                 foreach (var line in lines)
                     line.IsDeleted = true;
@@ -89,7 +91,7 @@ namespace BillingSystem.InvoiceService.Application.Implementation
 
                 throw;
             }
-            
+
         }
 
         public Task<IDataResult<InvoiceListItemDto>> GetInvoice(int id)
@@ -105,14 +107,14 @@ namespace BillingSystem.InvoiceService.Application.Implementation
                 i.InvoiceDate <= dto.EndDate.ToUniversalTime());
 
             var invoiceList = entity
-        .Select(i => new InvoiceListItemDto
-        {
-            InvoiceId = i.InvoiceId,
-            InvoiceNumber = i.InvoiceNumber,
-            InvoiceDate = i.InvoiceDate,
-            TotalAmount = i.TotalAmount,
-            //CustomerTitle = i.Customer != null ? i.Customer.Title : "" // Customer navigation varsa
-        }).ToList();
+                        .Select(i => new InvoiceListItemDto
+                        {
+                            InvoiceId = i.InvoiceId,
+                            InvoiceNumber = i.InvoiceNumber,
+                            InvoiceDate = i.InvoiceDate,
+                            TotalAmount = i.TotalAmount,
+                            //CustomerTitle = i.Customer != null ? i.Customer.Title : "" // Customer navigation varsa
+                        }).ToList();
 
             return new SuccessDataResult<InvoiceListResponseDto>(new InvoiceListResponseDto
             {
@@ -129,7 +131,7 @@ namespace BillingSystem.InvoiceService.Application.Implementation
                 await _unitOfWork.BeginTransactionAsync();
                 var existingInvoice = await _invoiceRepository.GetAsync(i => i.InvoiceId == dto.InvoiceId && !i.IsDeleted);
                 if (existingInvoice == null)
-                    return new ErrorDataResult<InvoiceUpdateResponseDto> (new InvoiceUpdateResponseDto{ Success = false, Message = "Fatura bulunamadı." });
+                    return new ErrorDataResult<InvoiceUpdateResponseDto>(new InvoiceUpdateResponseDto { Success = false, Message = "Fatura bulunamadı." });
 
                 existingInvoice.InvoiceNumber = dto.InvoiceNumber;
                 existingInvoice.InvoiceDate = dto.InvoiceDate;
@@ -143,7 +145,7 @@ namespace BillingSystem.InvoiceService.Application.Implementation
 
 
                 foreach (var deleteLine in linesToDelete)
-                    _invoiceLineRepository.Delete(deleteLine);
+                    _invoiceLineRepository.SoftDelete(deleteLine);
 
 
                 foreach (var lineDto in dto.InvoiceLines)
@@ -189,7 +191,7 @@ namespace BillingSystem.InvoiceService.Application.Implementation
                 return new ErrorDataResult<InvoiceUpdateResponseDto>(new InvoiceUpdateResponseDto { Success = false, Message = $"Hata: {ex.Message}" });
                 throw;
             }
-            
+
         }
     }
 }
