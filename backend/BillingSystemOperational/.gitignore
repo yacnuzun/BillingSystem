@@ -1,6 +1,7 @@
 
 *.user
 *.suo
+*.wsuo
 *.userosscache
 *.sln.docstates
 
