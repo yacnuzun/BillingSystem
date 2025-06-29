@@ -9,6 +9,7 @@ namespace BillingSystem.InvoiceService.Application.Interface
         public Task<IDataResult<InvoiceUpdateResponseDto>> Update(InvoiceUpdateDto dto);
         public Task<IDataResult<InvoiceDeleteResponseDto>> Delete(InvoiceDeleteRequestDto dto);
         public Task<IDataResult<InvoiceListResponseDto>> GetInvoiceList(InvoiceListItemRequestDto dto);
-        public Task<IDataResult<InvoiceListItemDto>> GetInvoice(int id);
+        public Task<IDataResult<InvoiceUpdateDto>> GetInvoice(int id);
+        public Task<IDataResult<InvoiceListResponseDto>> GetInvoices();
     }
 }

@@ -20,6 +20,26 @@ namespace BillingSystem.InvoiceService.WebApi.Controllers
         {
             return Ok();
         }
+        [HttpGet("getivoices")]
+        public async Task<IActionResult> GetListInvoice()
+        {
+            var result = await  _invoiceService.GetInvoices();
+            if (!result.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetInvoice(int id) 
+        {
+            var result = await _invoiceService.GetInvoice(id);
+            if (!result.Success)
+            {
+                return BadRequest(result.Data);
+            }
+            return Ok(result.Data);
+        }
         [HttpGet("getlist")]
         public async Task<IActionResult> InvoiceList(InvoiceListItemRequestDto requestDto)
         {

@@ -1,6 +1,7 @@
 ﻿using BillingSystem.AccountService.Domain;
 using BillingSystem.AccountService.WebApi.Extension;
 using BillingSystem.Shared.Helper.Security.Encryption;
+using BillingSystem.Shared.Helper.Security.Security;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;

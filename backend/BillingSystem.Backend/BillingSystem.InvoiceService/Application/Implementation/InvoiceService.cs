@@ -30,7 +30,7 @@ namespace BillingSystem.InvoiceService.Application.Implementation
                 {
                     CustomerId = dto.CustomerId,
                     InvoiceNumber = dto.InvoiceNumber,
-                    InvoiceDate = dto.InvoiceDate,
+                    InvoiceDate = dto.InvoiceDate.ToUniversalTime(),
                     TotalAmount = dto.TotalAmount,
                     UserId = dto.UserId,
                     RecordDate = DateTime.UtcNow,
@@ -94,9 +94,31 @@ namespace BillingSystem.InvoiceService.Application.Implementation
 
         }
 
-        public Task<IDataResult<InvoiceListItemDto>> GetInvoice(int id)
+        public async Task<IDataResult<InvoiceUpdateDto>> GetInvoice(int id)
         {
-            throw new NotImplementedException();
+            var result = await _invoiceRepository.GetAsync(i => i.IsDeleted != true && i.InvoiceId == id);
+            var lineResult = await _invoiceLineRepository.ListAsync(il => il.IsDeleted != true && il.InvoiceId == id);
+            var dto = new InvoiceUpdateDto
+            {
+                CustomerId = result.CustomerId,
+                InvoiceDate = result.InvoiceDate,
+                InvoiceId = result.InvoiceId,
+                TotalAmount = result.TotalAmount,
+                InvoiceNumber = result.InvoiceNumber,
+                UserId = result.UserId,
+                InvoiceLines = lineResult.Select(il => new InvoiceLineUpdateDto
+                {
+                    InvoiceLineId = il.InvoiceLineId,
+                    ItemName = il.ItemName,
+                    Price = il.Price,
+                    Quantity = il.Quantity
+                }).ToList()
+            };
+            if (result is not null)
+            {
+                return new SuccessDataResult<InvoiceUpdateDto>(dto);
+            }
+            return new ErrorDataResult<InvoiceUpdateDto>();
         }
 
         public async Task<IDataResult<InvoiceListResponseDto>> GetInvoiceList(InvoiceListItemRequestDto dto)
@@ -124,6 +146,30 @@ namespace BillingSystem.InvoiceService.Application.Implementation
             throw new NotImplementedException();
         }
 
+        public async Task<IDataResult<InvoiceListResponseDto>> GetInvoices()
+        {
+            try
+            {
+                var listInvoice = await _invoiceRepository.ListAsync(i => i.IsDeleted == false);
+                var listDto = listInvoice.Select(x => new InvoiceListItemDto
+                {
+                    InvoiceDate = x.InvoiceDate,
+                    CustomerTitle = "",
+                    InvoiceId = x.InvoiceId,
+                    InvoiceNumber = x.InvoiceNumber,
+                    TotalAmount = x.TotalAmount
+                }).ToList();
+
+                return new SuccessDataResult<InvoiceListResponseDto>(new InvoiceListResponseDto { Invoices = listDto });
+
+            }
+            catch (Exception)
+            {
+                return new ErrorDataResult<InvoiceListResponseDto>();
+                throw;
+            }
+        }
+
         public async Task<IDataResult<InvoiceUpdateResponseDto>> Update(InvoiceUpdateDto dto)
         {
             try
@@ -134,7 +180,7 @@ namespace BillingSystem.InvoiceService.Application.Implementation
                     return new ErrorDataResult<InvoiceUpdateResponseDto>(new InvoiceUpdateResponseDto { Success = false, Message = "Fatura bulunamadı." });
 
                 existingInvoice.InvoiceNumber = dto.InvoiceNumber;
-                existingInvoice.InvoiceDate = dto.InvoiceDate;
+                existingInvoice.InvoiceDate = dto.InvoiceDate.ToUniversalTime();
                 existingInvoice.TotalAmount = dto.TotalAmount;
                 existingInvoice.CustomerId = dto.CustomerId;
 
@@ -160,7 +206,7 @@ namespace BillingSystem.InvoiceService.Application.Implementation
                             Quantity = lineDto.Quantity,
                             Price = lineDto.Price,
                             UserId = dto.UserId,
-                            RecordDate = DateTime.UtcNow,
+                            RecordDate = DateTime.UtcNow.ToUniversalTime(),
                             IsDeleted = false,
                         };
                         await _invoiceLineRepository.AddAsync(newLine);

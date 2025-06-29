@@ -1,0 +1,59 @@
+<form (ngSubmit)="onSubmit()" #invoiceForm="ngForm">
+  <div class="form-group">
+    <label>Müşteri ID</label>
+    <input type="text" class="form-control" [(ngModel)]="invoice.customerId" name="customerId" required>
+  </div>
+  <div class="form-group">
+    <label>Fatura No</label>
+    <input type="text" class="form-control" [(ngModel)]="invoice.invoiceNumber" name="invoiceNumber" required>
+  </div>
+  <div class="form-group">
+    <label>Fatura Tarihi</label>
+    <input type="date" class="form-control" [(ngModel)]="invoice.invoiceDate" name="invoiceDate" required>
+  </div>
+  <div class="form-group">
+    <label>Kullanıcı ID</label>
+    <input type="hidden" class="form-control" [(ngModel)]="invoice.userId" name="userId"
+    value="{{invoice.userId}}" required>
+  </div>
+
+  <h5>Fatura Kalemleri</h5>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Ürün Adı</th>
+        <th>Adet</th>
+        <th>Birim Fiyat</th>
+        <th>Toplam</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let line of invoice.invoiceLines; let i = index">
+        <td>
+          <input type="text" class="form-control" [(ngModel)]="line.itemName" name="itemName{{i}}" required>
+        </td>
+        <td>
+          <input type="number" class="form-control" [(ngModel)]="line.quantity" name="quantity{{i}}" min="1" (input)="calculateTotal()" required>
+        </td>
+        <td>
+          <input type="number" class="form-control" [(ngModel)]="line.price" name="price{{i}}" min="0" (input)="calculateTotal()" required>
+        </td>
+        <td>
+          {{ line.quantity * line.price | currency:'₺' }}
+        </td>
+        <td>
+          <button type="button" class="btn btn-danger btn-sm" (click)="removeLine(i)" *ngIf="invoice.invoiceLines.length > 1">Sil</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <button type="button" class="btn btn-secondary" (click)="addLine()">+ Kalem Ekle</button>
+
+  <div class="form-group mt-3">
+    <label>Fatura Toplamı:</label>
+    <span>{{ invoice.totalAmount | currency:'₺' }}</span>
+  </div>
+
+  <button type="submit"  class="btn btn-primary mt-3" [disabled]="!invoiceForm.form.valid">Kaydet</button>
+</form>

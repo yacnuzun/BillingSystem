@@ -1,4 +1,5 @@
 ﻿using BillingSystem.CustomerService.Application.Service.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,6 +16,7 @@ namespace BillingSystem.CustomerService.WebApi.Controllers
             _customerService = customerService;
         }
 
+        [Authorize]
         [HttpGet("getcustomers")]
         public async Task<IActionResult> GetCustomers()
         {

@@ -1,12 +1,14 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  templateUrl: './app.html',
-  styleUrl: './app.css'
+  standalone: true, // STANDALONE TRUE
+  imports: [CommonModule, RouterOutlet],
+  template: '<router-outlet></router-outlet>', // Sadece router-outlet
+  styleUrls: ['./app.css']
 })
-export class App {
-  protected title = 'BillingSystem.Frontend';
+export class AppComponent {
+  title = 'BillingSystem.Frontend';
 }

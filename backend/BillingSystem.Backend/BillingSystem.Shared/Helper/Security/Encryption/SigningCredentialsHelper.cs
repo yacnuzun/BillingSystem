@@ -10,7 +10,7 @@ namespace BillingSystem.Shared.Helper.Security.Encryption
     {
         public static SigningCredentials CreateSigningCredentials(SecurityKey securityKey)
         {
-            return new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256Signature);
+            return new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
         }
 
     }

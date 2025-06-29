@@ -25,7 +25,18 @@
               }
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "node_modules/@fortawesome/fontawesome-free/css/all.min.css",
+              "node_modules/bootstrap/dist/css/bootstrap.min.css",
+              "public/css/sb-admin-2.min.css",
+              "public/css/sb-admin-2.css"
+            ],
+            "scripts":[
+              "node_modules/jquery/dist/jquery.min.js",
+              "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js",
+              "node_modules/popper.js/dist/umd/popper.min.js",
+              "public/js/sb-admin-2.min.js",
+              "public/js/sb-admin-2.js"
             ],
             "server": "src/main.server.ts",
             "outputMode": "server",
@@ -38,8 +49,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+    "maximumWarning": "1.5mb",
+    "maximumError": "2mb"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -93,5 +104,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": "5272170c-3b7d-4602-a731-1dd111f8cb36"
   }
 }
