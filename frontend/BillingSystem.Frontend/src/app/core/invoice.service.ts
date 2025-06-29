@@ -15,7 +15,7 @@ import {
   providedIn: 'root'
 })
 export class InvoiceService {
-  private apiUrl = 'https://localhost:44321/api/Invoice'; // Backend API URL'niz
+  private apiUrl = 'https://localhost:44326/api/Invoice'; // Backend API URL'niz
 
   constructor(private http: HttpClient) { }
 
