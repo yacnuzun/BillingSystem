@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Shared.Helper.Encryption;
 using BillingSystemOperational.CustomerService.Infrastructure.DependencyResolver;
 using Shared.Helper.Security;
+using BillingSystemOperational.CustomerService.Infrastructure.HttpClients;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigurationManager configurationManager = builder.Configuration;
@@ -14,6 +15,7 @@ ConfigurationManager configurationManager = builder.Configuration;
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddSwaggerGen();
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 builder.Host.ConfigureContainer<ContainerBuilder>(builder => builder.RegisterModule(new AutofacBusinessModule()));
@@ -61,6 +63,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseMiddleware<TokenInjectionHandler>();
 app.UseCors("Frontend");
 app.UseHttpsRedirection();
 

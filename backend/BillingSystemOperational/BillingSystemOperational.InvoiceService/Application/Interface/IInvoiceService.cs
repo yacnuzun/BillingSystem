@@ -11,5 +11,6 @@ namespace BillingSystemOperational.InvoiceService.Application.Interface
         public Task<IDataResult<InvoiceListResponseDto>> GetInvoiceList(InvoiceListItemRequestDto dto);
         public Task<IDataResult<InvoiceUpdateDto>> GetInvoice(int id);
         public Task<IDataResult<InvoiceListResponseDto>> GetInvoices();
+        public Task<IDataResult<CustomerDetailDto>> GetCustomer(int id);
     }
 }

@@ -8,9 +8,11 @@ namespace BillingSystemOperational.CustomerService.Application.Service.Implement
     public class CustomerService : ICustomerService
     {
         private readonly ICustomerRepository _customerRepository;
-        public CustomerService(ICustomerRepository customerRepository)
+        private readonly IHttpContextAccessor _contextAccessor;
+        public CustomerService(ICustomerRepository customerRepository, IHttpContextAccessor contextAccessor)
         {
             _customerRepository = customerRepository;
+            _contextAccessor = contextAccessor;
         }
 
         public async Task<IDataResult<CustomerDetailDto>> GetCustomer(int id)
@@ -32,7 +34,8 @@ namespace BillingSystemOperational.CustomerService.Application.Service.Implement
         {
             try
             {
-                var entities = await _customerRepository.ListAsync(c=> c.IsDeleted != true);
+                var currentUser = _contextAccessor.HttpContext.Items["userId"].ToString();
+                var entities = await _customerRepository.ListAsync(c=> c.IsDeleted != true && c.UserId != Convert.ToUInt32(currentUser) );
 
                 var listDto = entities.Select(CustomerListItemDto.GetModel).ToList();
 

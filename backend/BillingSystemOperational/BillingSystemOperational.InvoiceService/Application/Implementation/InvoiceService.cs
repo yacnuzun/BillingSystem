@@ -2,8 +2,15 @@
 using BillingSystemOperational.InvoiceService.Application.Interface;
 using BillingSystemOperational.InvoiceService.Domain;
 using BillingSystemOperational.InvoiceService.Infrastructure.Repository.Interface;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Shared.Constant;
 using Shared.Helper.GenericResultModel;
 using Shared.Persistance.Interface;
+using System.Data;
+using System.Net.Http.Headers;
+using System.Text;
 
 namespace BillingSystemOperational.InvoiceService.Application.Implementation
 {
@@ -12,12 +19,15 @@ namespace BillingSystemOperational.InvoiceService.Application.Implementation
         private readonly IInvoiceRepository _invoiceRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IInvoiceLineRepository _invoiceLineRepository;
+        private static HttpClient _httpClient = new HttpClient();
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public InvoiceService(IInvoiceRepository invoiceRepository, IUnitOfWork unitOfWork, IInvoiceLineRepository invoiceLineRepository)
+        public InvoiceService(IInvoiceRepository invoiceRepository, IUnitOfWork unitOfWork, IInvoiceLineRepository invoiceLineRepository, IHttpContextAccessor httpContextAccessor)
         {
             _invoiceRepository = invoiceRepository;
             _unitOfWork = unitOfWork;
             _invoiceLineRepository = invoiceLineRepository;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<IDataResult<InvoiceSaveResponseDto>> Add(InvoiceSaveDto dto)
@@ -93,39 +103,86 @@ namespace BillingSystemOperational.InvoiceService.Application.Implementation
 
         }
 
+        public async Task<IDataResult<CustomerDetailDto>> GetCustomer(int id)
+        {
+            var content = new StringContent(JsonConvert.SerializeObject(id), Encoding.UTF8, "application/json");
+            string token = _httpContextAccessor.HttpContext?.Items["Authorization"].ToString().Replace("Bearer ","");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            var request = await _httpClient.PostAsync("https://localhost:44391/api/Customer", content);
+
+            if (!request.IsSuccessStatusCode)
+            {
+                return new ErrorDataResult<CustomerDetailDto>(Messages.FailedProccess);
+            }
+
+            string response = await request.Content.ReadAsStringAsync();
+
+            CustomerDetailDto success = JsonConvert.DeserializeObject<CustomerDetailDto>(response);
+
+            if (success is null)
+            {
+                return new ErrorDataResult<CustomerDetailDto>(Messages.FailedProccess);
+            }
+
+            return new SuccessDataResult<CustomerDetailDto>(success, Messages.SuccessProccess);
+        }
+
         public async Task<IDataResult<InvoiceUpdateDto>> GetInvoice(int id)
         {
-            var result = await _invoiceRepository.GetAsync(i => i.IsDeleted != true && i.InvoiceId == id);
-            var lineResult = await _invoiceLineRepository.ListAsync(il => il.IsDeleted != true && il.InvoiceId == id);
-            var dto = new InvoiceUpdateDto
+            try
             {
-                CustomerId = result.CustomerId,
-                InvoiceDate = result.InvoiceDate,
-                InvoiceId = result.InvoiceId,
-                TotalAmount = result.TotalAmount,
-                InvoiceNumber = result.InvoiceNumber,
-                UserId = result.UserId,
-                InvoiceLines = lineResult.Select(il => new InvoiceLineUpdateDto
+                var result = await _invoiceRepository.GetAsync(i => i.IsDeleted != true && i.InvoiceId == id);
+                if (result is null)
                 {
-                    InvoiceLineId = il.InvoiceLineId,
-                    ItemName = il.ItemName,
-                    Price = il.Price,
-                    Quantity = il.Quantity
-                }).ToList()
-            };
-            if (result is not null)
-            {
-                return new SuccessDataResult<InvoiceUpdateDto>(dto);
+                    return new ErrorDataResult<InvoiceUpdateDto>();
+                }
+                var customerInfos = await GetCustomer(result.CustomerId);
+                if (customerInfos.Data is null || !customerInfos.Success || customerInfos is null)
+                {
+                    return new ErrorDataResult<InvoiceUpdateDto>();
+                }
+                var lineResult = await _invoiceLineRepository.ListAsync(il => il.IsDeleted != true && il.InvoiceId == id);
+                if (lineResult is null || lineResult.Count()<=0)
+                {
+                    return new ErrorDataResult<InvoiceUpdateDto>();
+                }
+                var dto = new InvoiceUpdateDto
+                {
+                    CustomerId = result.CustomerId,
+                    InvoiceDate = result.InvoiceDate,
+                    InvoiceId = result.InvoiceId,
+                    TotalAmount = result.TotalAmount,
+                    InvoiceNumber = result.InvoiceNumber,
+                    UserId = result.UserId,
+                    InvoiceLines = lineResult.Select(il => new InvoiceLineUpdateDto
+                    {
+                        InvoiceLineId = il.InvoiceLineId,
+                        ItemName = il.ItemName,
+                        Price = il.Price,
+                        Quantity = il.Quantity
+                    }).ToList()
+                };
+                if (result is not null)
+                {
+                    return new SuccessDataResult<InvoiceUpdateDto>(dto);
+                }
+                return new ErrorDataResult<InvoiceUpdateDto>();
             }
-            return new ErrorDataResult<InvoiceUpdateDto>();
+            catch (Exception ex)
+            {
+
+                return new ErrorDataResult<InvoiceUpdateDto>(ex.Message);
+                throw;
+            }
+            
         }
 
         public async Task<IDataResult<InvoiceListResponseDto>> GetInvoiceList(InvoiceListItemRequestDto dto)
         {
             var entity = await _invoiceRepository.ListAsync(i =>
                 !i.IsDeleted &&
-                i.InvoiceDate >= dto.StartDate.ToUniversalTime() &&
-                i.InvoiceDate <= dto.EndDate.ToUniversalTime());
+                i.InvoiceDate >= Convert.ToDateTime(dto.StartDate).ToUniversalTime() &&
+                i.InvoiceDate <= Convert.ToDateTime(dto.EndDate).ToUniversalTime());
 
             var invoiceList = entity
                         .Select(i => new InvoiceListItemDto
@@ -153,7 +210,7 @@ namespace BillingSystemOperational.InvoiceService.Application.Implementation
                 var listDto = listInvoice.Select(x => new InvoiceListItemDto
                 {
                     InvoiceDate = x.InvoiceDate,
-                    CustomerTitle = "",
+                    CustomerTitle = GetCustomer(x.CustomerId).Result.Data.Title.IsNullOrEmpty()? "": GetCustomer(x.CustomerId).Result.Data.Title,
                     InvoiceId = x.InvoiceId,
                     InvoiceNumber = x.InvoiceNumber,
                     TotalAmount = x.TotalAmount

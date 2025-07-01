@@ -4,7 +4,19 @@
         <i class="fas fa-plus fa-sm text-white-50"></i> Yeni Fatura Oluştur
     </a>
 </div>
-
+<div class="row mb-3">
+    <div class="col-md-3">
+        <label for="startDate">Başlangıç Tarihi:</label>
+        <input type="date" id="startDate" [(ngModel)]="filterStartDate" class="form-control" />
+    </div>
+    <div class="col-md-3">
+        <label for="endDate">Bitiş Tarihi:</label>
+        <input type="date" id="endDate" [(ngModel)]="filterEndDate" class="form-control" />
+    </div>
+    <div class="col-md-3 d-flex align-items-end">
+        <button class="btn btn-success w-100" (click)="filterInvoicesByDate()">Tarihe Göre Filtrele</button>
+    </div>
+</div>
 <div class="card shadow mb-4">
     <div class="card-header py-3">
         <h6 class="m-0 font-weight-bold text-primary">Fatura Listesi</h6>

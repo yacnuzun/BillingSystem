@@ -3,6 +3,7 @@ using BillingSystemOperational.CustomerService.Application.Service.Interface;
 using BillingSystemOperational.CustomerService.Infrastructure.Data;
 using BillingSystemOperational.CustomerService.Infrastructure.Repository.Implementation;
 using BillingSystemOperational.CustomerService.Infrastructure.Repository.Interface;
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Shared.Persistance.Implementation;
 using Shared.Persistance.Interface;
@@ -17,6 +18,7 @@ namespace BillingSystemOperational.CustomerService.Infrastructure.DependencyReso
             #region helper
             builder.RegisterType<EfUnitOfWork<CustomerDbContext>>().As<IUnitOfWork>();
             #endregion
+
             #region repo
             builder.RegisterType<CustomerRepository>().As<ICustomerRepository>();
             #endregion
@@ -37,7 +39,12 @@ namespace BillingSystemOperational.CustomerService.Infrastructure.DependencyReso
             .InstancePerLifetimeScope();
 
 
-
+            #region validators
+            //builder.RegisterType<ClaimValidator>().As<IValidator<ClaimDto>>().InstancePerLifetimeScope();
+            //builder.RegisterType<ClaimValidator>().As<IValidator<ClaimDto>>().InstancePerLifetimeScope();
+            //builder.RegisterType<ClaimValidator>().As<IValidator<ClaimDto>>().InstancePerLifetimeScope();
+            //builder.RegisterType<ClaimValidator>().As<IValidator<ClaimDto>>().InstancePerLifetimeScope();
+            #endregion
 
         }
     }

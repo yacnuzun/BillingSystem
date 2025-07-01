@@ -1,18 +1,18 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common'; // ngFor, ngIf gibi direktifler için gerekli
 import { FormsModule } from '@angular/forms';   // ngModel gibi form direktifleri için gerekli
-
+import { CustomerComponent } from '../../../shared/component/customer/customer.component'; // Müşteri seçimi için
 import { InvoiceService } from '../../../core/invoice.service';
 import { InvoiceCreateRequestDto } from '../../../core/dto/invoice-dtos';
+import { AuthService } from '../../../core/auth.service';
 
 @Component({
   selector: 'app-invoice-create',
-  standalone: true, // Zaten doğru şekilde belirlenmiş
+  standalone: true,
   imports: [
-    CommonModule, // HTML'deki *ngFor, *ngIf gibi yapısal direktifler için
-    FormsModule   // Input'larda [(ngModel)] kullanıyorsanız bu gerekli
-    // Eğer Reactive Forms kullanıyorsanız ReactiveFormsModule de eklemeniz gerekir.
-    // ReactiveFormsModule // Eğer Reactive Forms kullanıyorsanız
+    CommonModule,
+    FormsModule,
+    CustomerComponent
   ],
   templateUrl: './invoice-create.component.html',
   styleUrls: ['./invoice-create.component.css']
@@ -21,20 +21,41 @@ export class InvoiceCreateComponent {
   invoice: InvoiceCreateRequestDto = {
     customerId: 0,
     invoiceNumber: '',
-    invoiceDate: new Date().toISOString().substring(0, 10), // Varsayılan tarih ayarı
+    invoiceDate: new Date().toISOString().substring(0, 10),
     totalAmount: 0,
-    userId: 0, // Bu değerin doğru bir şekilde atanması gerekecektir (örn. kimlik doğrulama servisinden)
+    userId: 0,
     invoiceLines: [
       { itemName: '', quantity: 1, price: 0 }
     ],
     customerName: '',
     customerAddress: '',
-    issueDate: new Date().toISOString().substring(0, 10), // Muhtemelen invoiceDate ile aynı veya benzer
-    dueDate: '', // Bu değerin de atanması gerekecektir
-    items: [] // Bu alan muhtemelen invoiceLines ile çakışıyor, kontrol etmelisiniz.
+    issueDate: new Date().toISOString().substring(0, 10),
+    dueDate: '',
+    items: []
   };
 
-  constructor(private invoiceService: InvoiceService) {}
+
+
+  onCustomerSelected(customerId: number) {
+    this.invoice.customerId = customerId;
+  }
+
+  constructor(private invoiceService: InvoiceService, private authService: AuthService) { }
+  
+  ngOnInit() {
+    // Kullanıcı bilgilerini al ve faturaya ata
+    this.getUser();
+  }
+  
+  getUser() {
+    const value = this.authService.getCurrentUser();
+    if (value !== null) {
+      const user: number = value// Kullanıcı ID'sini al ve faturaya ata
+      this.invoice.userId = user; // Kullanıcı ID'sini faturaya ata
+    } else {
+      alert("Lütfen giriş yapın!");
+    }
+  }
 
   // Fatura satırı ekleme
   addLine() {

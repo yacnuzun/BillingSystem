@@ -1,8 +1,5 @@
 <form (ngSubmit)="onSubmit()" #invoiceForm="ngForm">
-  <div class="form-group">
-    <label>Müşteri ID</label>
-    <input type="text" class="form-control" [(ngModel)]="invoice.customerId" name="customerId" required>
-  </div>
+  
   <div class="form-group">
     <label>Fatura No</label>
     <input type="text" class="form-control" [(ngModel)]="invoice.invoiceNumber" name="invoiceNumber" required>
@@ -14,8 +11,13 @@
   <div class="form-group">
     <label>Kullanıcı ID</label>
     <input type="hidden" class="form-control" [(ngModel)]="invoice.userId" name="userId"
-    value="{{invoice.userId}}" required>
+    required>
   </div>
+
+   <app-customer
+    [selectedCustomerId]="invoice.customerId"
+    (customerSelected)="onCustomerSelected($event)">
+  </app-customer>
 
   <h5>Fatura Kalemleri</h5>
   <table class="table">

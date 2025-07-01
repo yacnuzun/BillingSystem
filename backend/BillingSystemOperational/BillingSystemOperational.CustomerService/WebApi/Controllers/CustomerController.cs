@@ -22,12 +22,24 @@ namespace BillingSystemOperational.CustomerService.WebApi.Controllers
         {
             return Ok(HttpContext.Request.Headers.Authorization.ToString());
         }
+        [Authorize]
         [HttpGet("getcustomers")]
         public async Task<IActionResult> GetCustomers()
         {
             var result = await _customerService.GetCustomers();
             return Ok(result);
 
+        }
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> GetCustomer([FromBody]int id)
+        {
+            var result = await _customerService.GetCustomer(id);
+            if (!result.Success || result.Data is null)
+            {
+                return BadRequest(result.Data);
+            }
+            return Ok(result.Data);
         }
     }
 }

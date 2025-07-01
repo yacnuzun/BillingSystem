@@ -1,0 +1,12 @@
+<label for="customer">Müşteri Seç</label>
+<select
+  id="customer"
+  class="form-select"
+  [ngModel]="selectedCustomerId"
+  (ngModelChange)="onSelectionChange($event)"
+>
+  <option [ngValue]="null">-- Müşteri Seçin --</option>
+  <option *ngFor="let customer of customers" [ngValue]="customer.customerId">
+    {{ customer.title }}
+  </option>
+</select>

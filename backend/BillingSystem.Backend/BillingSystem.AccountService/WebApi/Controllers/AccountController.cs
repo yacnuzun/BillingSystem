@@ -33,7 +33,7 @@ namespace BillingSystem.AccountService.WebApi.Controllers
             }
 
 
-            return Ok(result.Data);
+            return Ok(new LoginResponseDto { Token = result.Data, UserId = userToLogin.Data.UserId });
         }
     }
 }

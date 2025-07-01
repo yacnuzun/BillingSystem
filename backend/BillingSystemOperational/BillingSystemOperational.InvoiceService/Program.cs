@@ -1,10 +1,11 @@
-using Autofac.Extensions.DependencyInjection;
 using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using BillingSystemOperational.InvoiceService.Infrastructure.DependencyResolver;
+using BillingSystemOperational.InvoiceService.Infrastructure.HttpClient;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Shared.Helper.Encryption;
 using Shared.Helper.Security;
-using BillingSystemOperational.InvoiceService.Infrastructure.DependencyResolver;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigurationManager configurationManager = builder.Configuration;
@@ -15,6 +16,7 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHttpContextAccessor();
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 builder.Host.ConfigureContainer<ContainerBuilder>(builder => builder.RegisterModule(new AutofacBusinessModule()));
 var tokenOptions = configurationManager.GetSection("TokenOptions").Get<TokenOptions>();
@@ -50,7 +52,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("Frontend");
 
+app.UseMiddleware<TokenInjectionHandler>();
+
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

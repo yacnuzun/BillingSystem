@@ -5,20 +5,22 @@ import { ActivatedRoute, Router } from '@angular/router'; // Rota ve yönlendirm
 
 import { InvoiceService } from '../../../core/invoice.service';
 import { InvoiceUpdateRequestDto, InvoiceDetailResponseDto, InvoiceLineDto } from '../../../core/dto/invoice-dtos';
+import { CustomerComponent } from '../../../shared/component/customer/customer.component';
 
 @Component({
   selector: 'app-invoice-edit',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule
+    FormsModule,
+    CustomerComponent
   ],
-  templateUrl: './invoice-edit.component.html', // Ortak HTML kullanıyoruz
+  templateUrl: './invoice-edit.component.html', 
   styleUrls: ['./invoice-edit.component.css']
 })
 export class InvoiceEditComponent implements OnInit {
-  invoice: InvoiceUpdateRequestDto = { // Update DTO tipinde başlatıyoruz
-    invoiceId: 0, // Bu ID rota parametresinden gelecek
+  invoice: InvoiceUpdateRequestDto = { 
+    invoiceId: 0, 
     customerId: 0,
     invoiceNumber: '',
     invoiceDate: '',
@@ -26,6 +28,10 @@ export class InvoiceEditComponent implements OnInit {
     userId: 0,
     invoiceLines: []
   };
+
+  onCustomerSelected(customerId: number) {
+    this.invoice.customerId = customerId;
+  }
 
   invoiceId: number | null = null; // Düzenlenecek faturanın ID'si
 

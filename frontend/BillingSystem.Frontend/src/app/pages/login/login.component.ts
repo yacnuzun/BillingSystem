@@ -17,22 +17,26 @@ export class LoginComponent {
     password: ''
   };
   rememberMe: boolean = false;
-
+  ngOnInit(): void {
+    if (this.authService.isLoggedIn()) {
+      this.router.navigate(['/dashboard']);
+    }
+  }
   constructor(private authService: AuthService, private router: Router) { }
 
   onLoginSubmit() {
-  console.log('Login attempt with:', this.loginData);
+    console.log('Login attempt with:', this.loginData);
 
-  this.authService.login(this.loginData).subscribe({
-    next: (response) => {
-      console.log('Login successful', response);
-      alert('Giriş başarılı!');
-      // this.router.navigate(['/dashboard']);
-    },
-    error: (error) => {
-      console.error('Login error', error);
-      alert('Giriş başarısız! Lütfen bilgilerinizi kontrol edin.');
-    }
-  });
-}
+    this.authService.login(this.loginData).subscribe({
+      next: (response) => {
+        console.log('Login successful', response);
+        alert('Giriş başarılı!');
+        this.router.navigate(['/dashboard']);
+      },
+      error: (error) => {
+        console.error('Login error', error);
+        alert('Giriş başarısız! Lütfen bilgilerinizi kontrol edin.');
+      }
+    });
+  }
 }

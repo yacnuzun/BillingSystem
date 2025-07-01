@@ -1,8 +1,5 @@
 <form (ngSubmit)="onSubmit()" #invoiceForm="ngForm">
-  <div class="form-group">
-    <label>Müşteri ID</label>
-    <input type="number" class="form-control" [(ngModel)]="invoice.customerId" name="customerId" required>
-  </div>
+  
   <div class="form-group">
     <label>Fatura No</label>
     <input type="text" class="form-control" [(ngModel)]="invoice.invoiceNumber" name="invoiceNumber" required>
@@ -11,9 +8,12 @@
     <label>Fatura Tarihi</label>
     <input type="date" class="form-control" [(ngModel)]="invoice.invoiceDate" name="invoiceDate" required>
   </div>
+  <app-customer
+    (customerSelected)="onCustomerSelected($event)">
+  </app-customer>
   <div class="form-group">
     <label>Kullanıcı ID</label>
-    <input type="number" class="form-control" [(ngModel)]="invoice.userId" name="userId" required>
+    <input type="hidden" class="form-control" [(ngModel)]="invoice.userId" name="userId" required>
   </div>
 
   <h5>Fatura Kalemleri</h5>
