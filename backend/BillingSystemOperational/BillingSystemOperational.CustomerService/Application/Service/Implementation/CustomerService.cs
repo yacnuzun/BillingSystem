@@ -1,7 +1,10 @@
 ﻿using BillingSystemOperational.CustomerService.Application.Dto;
 using BillingSystemOperational.CustomerService.Application.Service.Interface;
+using BillingSystemOperational.CustomerService.Domain;
 using BillingSystemOperational.CustomerService.Infrastructure.Repository.Interface;
+using Shared.Constant;
 using Shared.Helper.GenericResultModel;
+using Shared.Persistance.Interface;
 
 namespace BillingSystemOperational.CustomerService.Application.Service.Implementation
 {
@@ -9,10 +12,42 @@ namespace BillingSystemOperational.CustomerService.Application.Service.Implement
     {
         private readonly ICustomerRepository _customerRepository;
         private readonly IHttpContextAccessor _contextAccessor;
-        public CustomerService(ICustomerRepository customerRepository, IHttpContextAccessor contextAccessor)
+        private readonly IUnitOfWork _unitofWork;
+        public CustomerService(ICustomerRepository customerRepository, IHttpContextAccessor contextAccessor, IUnitOfWork unitofWork)
         {
             _customerRepository = customerRepository;
             _contextAccessor = contextAccessor;
+            _unitofWork = unitofWork;
+        }
+
+        public async Task<CustomerAddResponse> AddAsync(CustomerAddDto customerAddDto)
+        {
+            try
+            {
+                await _unitofWork.BeginTransactionAsync();
+
+                Customer entity = new Customer()
+                {
+                    CustomerId = 0,
+                    Address = customerAddDto.Address,
+                    EMail = customerAddDto.EMail,
+                    IsDeleted = false,
+                    RecordDate = DateTime.UtcNow.ToUniversalTime(),
+                    TaxNumber = customerAddDto.TaxNumber,
+                    Title = customerAddDto.Title,
+                    UserId = customerAddDto.UserId
+                };
+                await _customerRepository.AddAsync(entity);
+                await _unitofWork.CommitAsync();
+                await _unitofWork.CommitTransactionAsync();
+                return new CustomerAddResponse() { Message =Messages.SuccessProccess, Success = true};
+            }
+            catch (Exception)
+            {
+                await _unitofWork.RollbackTransactionAsync();
+                return new CustomerAddResponse { Success= false , Message= Messages.FailedProccess};
+                throw;
+            }
         }
 
         public async Task<IDataResult<CustomerDetailDto>> GetCustomer(int id)

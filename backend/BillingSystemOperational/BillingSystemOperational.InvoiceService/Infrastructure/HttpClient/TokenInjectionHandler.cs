@@ -16,11 +16,15 @@ namespace BillingSystemOperational.InvoiceService.Infrastructure.HttpClient
         {
             if (context.Request.Headers.TryGetValue("Authorization", out var bearer))
             {
-                //context.Request.Headers.Authorization = bearer.ToString();
                 var token = bearer;
 
                 context.Items["Authorization"] = token;
                 
+            }
+
+            if (context.Request.Headers.TryGetValue("userid", out var user))
+            {
+                context.Items["userId"] = user;
             }
 
             await _next(context);

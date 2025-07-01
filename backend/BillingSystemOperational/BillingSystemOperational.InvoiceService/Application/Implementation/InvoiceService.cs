@@ -206,7 +206,8 @@ namespace BillingSystemOperational.InvoiceService.Application.Implementation
         {
             try
             {
-                var listInvoice = await _invoiceRepository.ListAsync(i => i.IsDeleted == false);
+                var userId = _httpContextAccessor.HttpContext.Items["userId"].ToString();
+                var listInvoice = await _invoiceRepository.ListAsync(i => i.IsDeleted == false && i.UserId == Convert.ToInt32(userId));
                 var listDto = listInvoice.Select(x => new InvoiceListItemDto
                 {
                     InvoiceDate = x.InvoiceDate,

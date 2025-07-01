@@ -23,6 +23,21 @@ namespace BillingSystem.AccountService.Applicaiton.Service.Implementation
             _logger = logger;
         }
 
+        public async Task<IDataResult<User>> AddAsync(User user)
+        {
+            try
+            {
+                var entity = await _userRepository.AddAsyncT(user);
+                return new SuccessDataResult<User>(entity);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"{ex.InnerException}/{ex.Message}/{ex.Source}");
+
+                throw;
+            }
+        }
+
         public async void Add(User user)
         {
             try

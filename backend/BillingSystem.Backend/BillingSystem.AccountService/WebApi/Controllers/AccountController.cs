@@ -1,6 +1,8 @@
 ﻿using BillingSystem.AccountService.Applicaiton;
 using BillingSystem.AccountService.Applicaiton.Service.Implementation;
 using BillingSystem.AccountService.Applicaiton.Service.Interface;
+using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,10 +13,12 @@ namespace BillingSystem.AccountService.WebApi.Controllers
     public class AccountController : ControllerBase
     {
         private readonly IAuthService _authManager;
+        private readonly IValidator<UserForRegisterDto> _userValidator;
 
-        public AccountController(IAuthService authManager)
+        public AccountController(IAuthService authManager, IValidator<UserForRegisterDto> userValidator)
         {
             _authManager = authManager;
+            _userValidator = userValidator;
         }
 
         [HttpPost]
@@ -35,5 +39,23 @@ namespace BillingSystem.AccountService.WebApi.Controllers
 
             return Ok(new LoginResponseDto { Token = result.Data, UserId = userToLogin.Data.UserId });
         }
+
+        [HttpPost("register")]
+        public async Task<IActionResult> Register(UserForRegisterDto userForRegisterDto)
+        {
+            var isValid = await _userValidator.ValidateAsync(userForRegisterDto);
+            if (!isValid.IsValid)
+            {
+                return BadRequest(isValid.Errors);
+            }
+            var result = await _authManager.Register(userForRegisterDto);
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+            
+            return Ok(result.Data);
+        }
+
     }
 }

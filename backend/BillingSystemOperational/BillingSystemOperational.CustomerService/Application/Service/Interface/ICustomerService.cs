@@ -7,5 +7,6 @@ namespace BillingSystemOperational.CustomerService.Application.Service.Interface
     {
         public Task<IDataResult<CustomerListResponseDto>> GetCustomers();
         public Task<IDataResult<CustomerDetailDto>> GetCustomer(int id);
+        public Task<CustomerAddResponse> AddAsync(CustomerAddDto customerAddDto);
     }
 }

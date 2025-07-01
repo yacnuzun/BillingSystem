@@ -9,5 +9,6 @@ namespace BillingSystem.AccountService.Applicaiton.Service.Interface
     {
         Task<IDataResult<User>> Login(UserForLoginDto userForLoginDto);
         Task<IDataResult<AccessToken>> CreateAccessToken(User user);
+        Task<IDataResult<User>> Register(UserForRegisterDto userForRegisterDto);
     }
 }

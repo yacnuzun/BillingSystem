@@ -1,13 +1,7 @@
-﻿using BillingSystem.Shared.Abstract;
+﻿using BillingSystemOperational.CustomerService.Domain;
 
-namespace BillingSystem.AccountService.Applicaiton
+namespace BillingSystemOperational.CustomerService.Application.Dto
 {
-    public class UserForRegisterDto : IDto
-    {
-        public string Password { get; set; }
-        public string UserName { get; set; }
-        public CustomerAddDto Customer { get; set; }
-    }
     public class CustomerAddDto
     {
         public string TaxNumber { get; set; }

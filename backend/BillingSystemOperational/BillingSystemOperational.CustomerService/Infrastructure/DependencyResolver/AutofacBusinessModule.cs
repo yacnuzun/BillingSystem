@@ -1,5 +1,7 @@
 ﻿using Autofac;
+using BillingSystemOperational.CustomerService.Application.Dto;
 using BillingSystemOperational.CustomerService.Application.Service.Interface;
+using BillingSystemOperational.CustomerService.Application.Validator;
 using BillingSystemOperational.CustomerService.Infrastructure.Data;
 using BillingSystemOperational.CustomerService.Infrastructure.Repository.Implementation;
 using BillingSystemOperational.CustomerService.Infrastructure.Repository.Interface;
@@ -40,10 +42,7 @@ namespace BillingSystemOperational.CustomerService.Infrastructure.DependencyReso
 
 
             #region validators
-            //builder.RegisterType<ClaimValidator>().As<IValidator<ClaimDto>>().InstancePerLifetimeScope();
-            //builder.RegisterType<ClaimValidator>().As<IValidator<ClaimDto>>().InstancePerLifetimeScope();
-            //builder.RegisterType<ClaimValidator>().As<IValidator<ClaimDto>>().InstancePerLifetimeScope();
-            //builder.RegisterType<ClaimValidator>().As<IValidator<ClaimDto>>().InstancePerLifetimeScope();
+            builder.RegisterType<CustomerAddDtoValidator>().As<IValidator<CustomerAddDto>>().InstancePerLifetimeScope();
             #endregion
 
         }

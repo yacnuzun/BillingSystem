@@ -1,4 +1,6 @@
-﻿using BillingSystemOperational.CustomerService.Application.Service.Interface;
+﻿using BillingSystemOperational.CustomerService.Application.Dto;
+using BillingSystemOperational.CustomerService.Application.Service.Interface;
+using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -10,10 +12,12 @@ namespace BillingSystemOperational.CustomerService.WebApi.Controllers
     public class CustomerController : ControllerBase
     {
         private readonly ICustomerService _customerService;
+        private readonly IValidator<CustomerAddDto> validator;
 
-        public CustomerController(ICustomerService customerService)
+        public CustomerController(ICustomerService customerService, IValidator<CustomerAddDto> validator)
         {
             _customerService = customerService;
+            this.validator = validator;
         }
 
         [Authorize]
@@ -40,6 +44,22 @@ namespace BillingSystemOperational.CustomerService.WebApi.Controllers
                 return BadRequest(result.Data);
             }
             return Ok(result.Data);
+        }
+
+        [HttpPost("addcustomer")]
+        public async Task<IActionResult> AddCustomer(CustomerAddDto customer)
+        {
+            var isValid = await validator.ValidateAsync(customer);
+            if (!isValid.IsValid)
+            {
+                return BadRequest(isValid.Errors);
+            }
+            var result = await _customerService.AddAsync(customer);
+            if (!result.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
         }
     }
 }

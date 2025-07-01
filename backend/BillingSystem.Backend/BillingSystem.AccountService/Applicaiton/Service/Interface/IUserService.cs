@@ -9,5 +9,6 @@ namespace BillingSystem.AccountService.Applicaiton.Service.Interface
         Task<IDataResult<List<User>>> GetAll();
         Task<IDataResult<User>> GetById(int id);
         Task<IDataResult<User>> GetExistUser(string userName);
+        Task<IDataResult<User>> AddAsync(User user);
     }
 }

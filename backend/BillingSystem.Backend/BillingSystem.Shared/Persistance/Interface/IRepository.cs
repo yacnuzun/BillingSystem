@@ -13,6 +13,7 @@ namespace BillingSystem.Shared.Persistance.Interface
         Task<T?> GetAsync(Expression<Func<T, bool>> predicate);
         Task<IEnumerable<T>> ListAsync(Expression<Func<T, bool>>? predicate = null);
         Task AddAsync(T entity);
+        Task<T> AddAsyncT(T entity);
         void Update(T entity);
         void SoftDelete(T entity);
         void Delete(T entity);

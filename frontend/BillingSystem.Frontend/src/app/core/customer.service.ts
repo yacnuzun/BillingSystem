@@ -2,6 +2,7 @@ import { HttpClient } from "@angular/common/http";
 import{ Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { AuthService } from "./auth.service";
+import { CustomerDto } from "./dto/customer-dto";
 
 @Injectable({
   providedIn: 'root'
@@ -27,11 +28,11 @@ export class CustomerService {
   }
 
   // READ (Query): Belirli bir müşteriyi ID ile getir
-  getCustomerById(customerId: number): Observable<any> {
+  getCustomerById(customerId: number): Observable<CustomerDto> {
     const headers = this.authService.setTokentoHeader();
-    const httpOptions = headers ? { headers: headers , params: { id: customerId.toString() }} : {params: { id: customerId.toString() }};
-    return this.http.get<any>(`${this.apiUrl}/getcustomer`, {
-      headers: httpOptions.headers , params: httpOptions.params
+    const httpOptions = headers ? { headers: headers } : {};
+    return this.http.post<CustomerDto>(`${this.apiUrl}`, customerId , {
+      headers: httpOptions.headers
     });
   }
 }

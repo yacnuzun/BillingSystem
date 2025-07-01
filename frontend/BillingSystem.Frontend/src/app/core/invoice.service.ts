@@ -24,44 +24,92 @@ export class InvoiceService {
 
   // READ (Query): Tüm faturaları getir
   getInvoices(): Observable<any> {
-    const headers = this.authService.setTokentoHeader();
+    let headers = this.authService.setTokentoHeader();
+    const userId = this.authService.getCurrentUser();
+    if (!userId) {
+      throw new Error('Kullanıcı ID bulunamadı. Lütfen giriş yapın.');
+    }
+    // Kullanıcı ID'sini header'a ekle
+    if (headers) {
+      headers = headers.set('userId', userId.toString());
+    }
     const httpOptions = headers ? { headers: headers } : {};
     return this.http.get<InvoiceRequestResult<InvoiceListResponseDto[]>>(this.apiUrl + "/getivoices",
-        { headers: httpOptions.headers });
+      { headers: httpOptions.headers });
   }
 
-  getInvoicewithDareRange(startDate: string, endDate: string): Observable<any>{
-    const headers = this.authService.setTokentoHeader();
-    const httpOptions = headers ? {headers: headers, params: {startDate: startDate, endDate: endDate}} : {params: {startDate: startDate, endDate: endDate}};
-    return this.http.get<InvoiceRequestResult<InvoiceListResponseDto[]>>(this.apiUrl+'/getlist', 
-      { headers: httpOptions.headers , params: httpOptions.params });
+  getInvoicewithDareRange(startDate: string, endDate: string): Observable<any> {
+    let headers = this.authService.setTokentoHeader();
+    const userId = this.authService.getCurrentUser();
+    if (!userId) {
+      throw new Error('Kullanıcı ID bulunamadı. Lütfen giriş yapın.');
+    }
+    // Kullanıcı ID'sini header'a ekle
+    if (headers) {
+      headers = headers.set('userId', userId.toString());
+    }
+    const httpOptions = headers ? { headers: headers, params: { startDate: startDate, endDate: endDate } } : { params: { startDate: startDate, endDate: endDate } };
+    return this.http.get<InvoiceRequestResult<InvoiceListResponseDto[]>>(this.apiUrl + '/getlist',
+      { headers: httpOptions.headers, params: httpOptions.params });
   }
 
   // READ (Query): Belirli bir faturayı ID ile getir
   getInvoiceById(invoiceId: number): Observable<any> {
-    const headers = this.authService.setTokentoHeader();
-    const httpOptions = headers ? { headers: headers , params: { id: invoiceId.toString() }} : {params: { id: invoiceId.toString()}};
-    return this.http.get<any>(`${this.apiUrl}`,{ headers: httpOptions.headers , params: httpOptions.params });
+    let headers = this.authService.setTokentoHeader();
+    const userId = this.authService.getCurrentUser();
+    if (!userId) {
+      throw new Error('Kullanıcı ID bulunamadı. Lütfen giriş yapın.');
+    }
+    // Kullanıcı ID'sini header'a ekle
+    if (headers) {
+      headers = headers.set('userId', userId.toString());
+    }
+    const httpOptions = headers ? { headers: headers, params: { id: invoiceId.toString() } } : { params: { id: invoiceId.toString() } };
+    return this.http.get<any>(`${this.apiUrl}`, { headers: httpOptions.headers, params: httpOptions.params });
   }
 
   // CREATE (Command): Yeni fatura oluştur
   createInvoice(command: InvoiceCreateRequestDto): Observable<any> {
-    const headers = this.authService.setTokentoHeader();
+    let headers = this.authService.setTokentoHeader();
+    const userId = this.authService.getCurrentUser();
+    if (!userId) {
+      throw new Error('Kullanıcı ID bulunamadı. Lütfen giriş yapın.');
+    }
+    // Kullanıcı ID'sini header'a ekle
+    if (headers) {
+      headers = headers.set('userId', userId.toString());
+    }
     const httpOptions = headers ? { headers: headers } : {};
-    return this.http.post<any>(this.apiUrl, command, {headers: httpOptions.headers});
+    return this.http.post<any>(this.apiUrl, command, { headers: httpOptions.headers });
   }
 
   // UPDATE (Command): Fatura güncelle
   updateInvoice(command: InvoiceUpdateRequestDto): Observable<any> {
-    const headers = this.authService.setTokentoHeader();
+    let headers = this.authService.setTokentoHeader();
+    const userId = this.authService.getCurrentUser();
+    if (!userId) {
+      throw new Error('Kullanıcı ID bulunamadı. Lütfen giriş yapın.');
+    }
+    // Kullanıcı ID'sini header'a ekle
+    if (headers) {
+      headers = headers.set('userId', userId.toString());
+    }
     const httpOptions = headers ? { headers: headers } : {};
-    return this.http.put<any>(`${this.apiUrl}`, command, {headers: httpOptions.headers});
+    return this.http.put<any>(`${this.apiUrl}`, command, { headers: httpOptions.headers });
   }
 
   // DELETE (Command): Fatura sil
   deleteInvoice(request: InvoiceDeleteRequestDto): Observable<any> {
-    const headers = this.authService.setTokentoHeader();
-    const httpOptions = headers ? { headers: headers , body: request} : {body: request};
+    let headers = this.authService.setTokentoHeader();
+    const userId = this.authService.getCurrentUser();
+    if (!userId) {
+      throw new Error('Kullanıcı ID bulunamadı. Lütfen giriş yapın.');
+    }
+    // Kullanıcı ID'sini header'a ekle
+    if (headers) {
+      headers = headers.set('userId', userId.toString());
+    }
+    const httpOptions = headers ? { headers: headers, body: request } : { body: request };
     return this.http.delete<InvoiceDeleteResponseDto>(`${this.apiUrl}`, httpOptions);
   }
 }

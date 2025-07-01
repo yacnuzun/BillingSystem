@@ -11,6 +11,8 @@ using BillingSystem.Shared.Persistance.Implementation;
 using BillingSystem.Shared.Persistance.Interface;
 using BillingSystem.AccountService.Infrastructure.Repository.Implementation;
 using BillingSystem.AccountService.Infrastructure.Repository.Interface;
+using BillingSystem.AccountService.Applicaiton.Validator;
+using FluentValidation;
 
 namespace BillingSystem.AccountService.Infrastructure.DependencyResolver.Autofac
 {
@@ -42,7 +44,10 @@ namespace BillingSystem.AccountService.Infrastructure.DependencyResolver.Autofac
             .InstancePerLifetimeScope();
 
 
-            
+            #region validators
+            builder.RegisterType<UserForRegisterDtoValidator>().As<IValidator<UserForRegisterDto>>().InstancePerLifetimeScope();
+            builder.RegisterType<CustomerAddDtoValidator>().As<IValidator<CustomerAddDto>>().InstancePerLifetimeScope();
+            #endregion
 
         }
     }

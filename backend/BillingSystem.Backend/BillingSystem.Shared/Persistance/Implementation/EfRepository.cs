@@ -30,6 +30,12 @@ namespace BillingSystem.Shared.Persistance.Implementation
             await Context.Set<T>().AddAsync(entity);
         }
 
+        public async Task<T> AddAsyncT(T entity)
+        {
+            var result = await Context.Set<T>().AddAsync(entity);
+            return entity;
+        }
+
         public void Update(T entity)
         {
             Context.Set<T>().Update(entity);

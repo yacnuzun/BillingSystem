@@ -9,10 +9,8 @@
 
         public async Task InvokeAsync(HttpContext request)
         {
-            // HttpContext'ten gelen isteğin Authorization başlığını al
             if (request.Request.Headers.TryGetValue("Authorization", out var bearer))
             {
-                //context.Request.Headers.Authorization = bearer.ToString();
                 var token = bearer;
 
                 request.Items["Authorization"] = token;
@@ -26,7 +24,6 @@
             }
 
 
-            // İsteği bir sonraki adıma ilet
             await _next(request);
         }
     }

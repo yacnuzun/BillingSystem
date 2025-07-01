@@ -81,7 +81,11 @@ export class InvoiceCreateComponent {
     // Örn: this.invoice.issueDate = new Date().toISOString().substring(0, 10);
 
     this.invoiceService.createInvoice(this.invoice).subscribe({
-      next: () => alert('Fatura başarıyla oluşturuldu!'),
+      next: () => {
+        alert('Fatura başarıyla oluşturuldu!');
+        window.location.reload(); // Sayfayı yenile
+
+      },
       error: (err) => {
         console.error('Fatura oluşturulurken hata oluştu:', err);
         alert('Fatura oluşturulamadı! Lütfen konsolu kontrol edin.');
